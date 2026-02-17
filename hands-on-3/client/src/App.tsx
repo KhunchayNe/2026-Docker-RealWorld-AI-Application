@@ -24,6 +24,9 @@ function App() {
   const [dieselPrice, setDieselPrice] = useState('')
   const [gasohol95Price, setGasohol95Price] = useState('')
   const [gasohol91Price, setGasohol91Price] = useState('')
+  const [gasoholE20Price, setGasoholE20Price] = useState('')
+  const [dieselB7Price, setDieselB7Price] = useState('')
+  const [lpgPrice, setLpgPrice] = useState('')
 
   const apiCall = async (endpoint: string, method = 'GET', body?: any) => {
     setLoading(true)
@@ -90,8 +93,11 @@ function App() {
               <option value="diesel">Diesel</option>
               <option value="gasohol_95">Gasohol 95</option>
               <option value="gasohol_91">Gasohol 91</option>
-              <option value="e20">E20</option>
-              <option value="e85">E85</option>
+              <option value="gasohol_e20">Gasohol E20</option>
+              <option value="gasohol_e85">Gasohol E85</option>
+              <option value="gasohol_91">Gasohol 91</option>
+              <option value="diesel_b7">Diesel B7</option>
+              <option value="lpg">LPG</option>
             </select>
           </div>
           <div className="form-group">
@@ -117,8 +123,11 @@ function App() {
               <option value="diesel">Diesel</option>
               <option value="gasohol_95">Gasohol 95</option>
               <option value="gasohol_91">Gasohol 91</option>
-              <option value="e20">E20</option>
-              <option value="e85">E85</option>
+              <option value="gasohol_e20">Gasohol E20</option>
+              <option value="gasohol_e85">Gasohol E85</option>
+              <option value="gasohol_91">Gasohol 91</option>
+              <option value="diesel_b7">Diesel B7</option>
+              <option value="lpg">LPG</option>
             </select>
           </div>
           <div className="form-group">
@@ -153,8 +162,11 @@ function App() {
               <option value="diesel">Diesel</option>
               <option value="gasohol_95">Gasohol 95</option>
               <option value="gasohol_91">Gasohol 91</option>
-              <option value="e20">E20</option>
-              <option value="e85">E85</option>
+              <option value="gasohol_e20">Gasohol E20</option>
+              <option value="gasohol_e85">Gasohol E85</option>
+              <option value="gasohol_91">Gasohol 91</option>
+              <option value="diesel_b7">Diesel B7</option>
+              <option value="lpg">LPG</option>
             </select>
           </div>
           <div className="form-group">
@@ -212,8 +224,38 @@ function App() {
               onChange={(e) => setGasohol91Price(e.target.value)}
             />
           </div>
+          <div className="form-group">
+            <label>Gasohol E20 Price:</label>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="39.20"
+              value={gasoholE20Price}
+              onChange={(e) => setGasoholE20Price(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Diesel B7 Price:</label>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="33.00"
+              value={dieselB7Price}
+              onChange={(e) => setDieselB7Price(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>LPG Price:</label>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="21.50"
+              value={lpgPrice}
+              onChange={(e) => setLpgPrice(e.target.value)}
+            />
+          </div>
           <button onClick={() => {
-            if (!dieselPrice && !gasohol95Price && !gasohol91Price) {
+            if (!dieselPrice && !gasohol95Price && !gasohol91Price && !gasoholE20Price && !dieselB7Price && !lpgPrice) {
               setError('Please enter at least one fuel price')
               return
             }
@@ -229,12 +271,18 @@ function App() {
             if (dieselPrice) data.diesel = parseFloat(dieselPrice)
             if (gasohol95Price) data.gasohol_95 = parseFloat(gasohol95Price)
             if (gasohol91Price) data.gasohol_91 = parseFloat(gasohol91Price)
+            if (gasoholE20Price) data.gasohol_e20 = parseFloat(gasoholE20Price)
+            if (dieselB7Price) data.diesel_b7 = parseFloat(dieselB7Price)
+            if (lpgPrice) data.lpg = parseFloat(lpgPrice)
 
             apiCall('/prices', 'POST', data).then(() => {
               // Clear form on success
               setDieselPrice('')
               setGasohol95Price('')
               setGasohol91Price('')
+              setGasoholE20Price('')
+              setDieselB7Price('')
+              setLpgPrice('')
             })
           }}>
             Add Price

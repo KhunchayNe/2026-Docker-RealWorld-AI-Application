@@ -1,0 +1,147 @@
+###################################################
+# Docker Compose for Oil Price Prediction Application
+#
+# This Compose file provides the development environment for the
+# oil price prediction app with FastAPI backend, React frontend,
+# Qdrant vector database, and Traefik reverse proxy.
+###################################################
+
+###################################################
+# Services
+#
+# The services define the individual components of our application stack.
+# For each service, a separate container will be launched.
+###################################################
+services:
+
+  ###################################################
+  # Service: proxy
+  #
+  # This service is a reverse proxy that will route requests to the appropriate
+  # service. It forwards requests to the backend or client service based on
+  # the URL path.
+  #
+  # - All requests to localhost/api/* will be forwarded to the backend (port 8000)
+  # - All other requests to localhost will be forwarded to the client (port 5173)
+  ###################################################
+  proxy:
+    image: traefik:v3.6
+    command: --providers.docker
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  ###################################################
+  # Service: backend
+  #
+  # This service is the FastAPI server that provides the API for the app.
+  # It connects to Qdrant for vector storage and similarity search.
+  #
+  # The Compose Watch configuration is used to automatically sync the code
+  # from the host machine to the container. This allows the server to be
+  # automatically reloaded when code changes are made.
+  #
+  # The environment variables configure the application to connect to Qdrant.
+  #
+  # The labels are used to configure Traefik (the reverse proxy) with
+  # the appropriate routing rules. All requests to localhost/api/* will be
+  # forwarded to this service's port 8000.
+  ###################################################
+  backend:
+    build:
+      context: ./
+      target: backend-dev
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+    depends_on:
+      - qdrant
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - __pycache__
+            - '*.pyc'
+            - .pytest_cache
+        - path: ./backend/requirements.txt
+          action: rebuild
+    labels:
+      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
+      traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes: /api
+      traefik.http.routers.backend.middlewares: backend-stripprefix
+      traefik.http.services.backend.loadbalancer.server.port: 8000
+
+  ###################################################
+  # Service: client
+  #
+  # The client service is the React app that provides the frontend for the app.
+  #
+  # The Compose Watch configuration is used to automatically sync the code from
+  # the host machine to the container. This allows the client to be automatically
+  # reloaded when code changes are made.
+  #
+  # The labels are used to configure Traefik (the reverse proxy) with the
+  # appropriate routing rules. All requests to localhost will be forwarded to
+  # this service's port 5173.
+  ###################################################
+  client:
+    build:
+      context: ./
+      target: client-dev
+    develop:
+      watch:
+        - path: ./client/src
+          action: sync
+          target: /usr/local/app/src
+        - path: ./client/package.json
+          action: rebuild
+    labels:
+      traefik.http.routers.client.rule: Host(`localhost`)
+      traefik.http.services.client.loadbalancer.server.port: 5173
+
+  ###################################################
+  # Service: qdrant
+  #
+  # The Qdrant service is used to provide vector storage for the application.
+  # The image for this service comes directly from Docker Hub.
+  #
+  # The data is persisted in a volume named oil-price-qdrant-data. Using a
+  # volume allows us to take down the services without losing the data.
+  ###################################################
+  qdrant:
+    image: qdrant/qdrant:v1.12.0
+    volumes:
+      - oil-price-qdrant-data:/qdrant/storage
+
+  ###################################################
+  # Service: qdrant-web-ui
+  #
+  # This service provides a web interface to Qdrant. It's useful for
+  # debugging and troubleshooting vector collections, points, and more.
+  #
+  # The labels are used to configure Traefik (the reverse proxy) with
+  # the routing rules. All requests to qdrant.localhost will be forwarded
+  # to this service's port 6333.
+  ###################################################
+  qdrant-web-ui:
+    image: qdrant/qdrant:v1.12.0
+    command: ["./qdrant", "--ui-path", "/"]
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    volumes:
+      - oil-price-qdrant-data:/qdrant/storage
+    labels:
+      traefik.http.routers.qdrant.rule: Host(`qdrant.localhost`)
+      traefik.http.services.qdrant.loadbalancer.server.port: 6333
+
+###################################################
+# Volumes
+#
+# For this application stack, we only have one volume. It's used to persist the
+# data for the Qdrant service.
+###################################################
+volumes:
+  oil-price-qdrant-data:

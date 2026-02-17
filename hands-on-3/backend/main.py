@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     collection_name: str = "oil_prices_eppo"
     model_dir: str = "./models"
     data_dir: str = "./data"
-    
+
     class Config:
         env_file = ".env"
 
@@ -41,7 +41,12 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Oil Price Prediction API",
     description="API สำหรับทำนายราคาน้ำมันด้วย Machine Learning + Qdrant Vector DB",
-    version="1.0.0"
+    version="1.0.0",
+    swagger_ui_parameters={
+        "defaultModelsExpandDepth": 1,
+        "defaultModelExpandDepth": 1,
+        "docExpansion": "list"
+    }
 )
 
 # CORS
