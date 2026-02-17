@@ -81,3 +81,10 @@ curl -X POST "http://localhost:8000/predict" \
     "fuel_type": "diesel",
     "horizon": 7
   }'
+
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fuel_type": "gasohol_95",
+    "horizon": 7
+  }'
