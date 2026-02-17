@@ -1,0 +1,27 @@
+# requirements.txt
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.0
+pydantic-settings==2.5.2
+
+# Qdrant
+qdrant-client==1.12.0
+
+# ML & Time Series
+statsmodels==0.14.4
+scikit-learn==1.5.2
+xgboost==2.1.2
+pmdarima==2.0.4
+
+# Embeddings (ใช้ CPU-only)
+sentence-transformers==3.3.0
+
+# Data Processing
+numpy==1.26.4
+pandas==2.2.3
+
+# Utilities
+requests==2.32.3
+python-dateutil==2.9.0
+python-multipart==0.0.12
+aiofiles==24.1.0

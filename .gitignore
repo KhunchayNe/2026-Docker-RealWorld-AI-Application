@@ -56,3 +56,6 @@ htmlcov/
 *.cover
 .hypothesis/
 .pytest_cache/
+
+//model
+*.pkl

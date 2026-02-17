@@ -1,0 +1,32 @@
+# requirements-python312.txt
+# สำหรับ Python 3.12, 3.13
+
+# FastAPI
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+pydantic-settings==2.5.2
+python-multipart==0.0.12
+
+
+# Qdrant
+qdrant-client>=1.7.0
+
+# Time Series - ใช้ตัวที่รองรับ Python 3.12+
+statsmodels>=0.14.0        # ARIMA, SARIMAX
+scikit-learn>=1.4.0
+xgboost>=2.0.0
+lightgbm>=4.3.0
+
+# Data processing
+numpy>=1.26.0
+pandas>=2.2.0
+
+# Embeddings - ใช้ without torch
+sentence-transformers>=2.3.0  # จะติดตั้ง torch latest อัตโนมัติ
+# หรือไม่ใช้ torch เลย ใช้ ONNX แทน
+
+# Utilities
+requests>=2.31.0
+python-dateutil>=2.8.0
+aiofiles==24.1.0

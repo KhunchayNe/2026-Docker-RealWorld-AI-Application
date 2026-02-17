@@ -1,0 +1,30 @@
+# requirements.txt - Updated for 2026
+
+# FastAPI
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+pydantic==2.6.1
+python-multipart==0.0.9
+
+# Qdrant
+qdrant-client==1.7.3
+
+# TensorFlow - Latest stable version
+tensorflow==2.18.0
+# หรือถ้าต้องการ CPU-only (เล็กกว่า 10 เท่า)
+# tensorflow-cpu==2.18.0
+
+# ML Libraries
+scikit-learn==1.4.0
+numpy==1.26.4
+pandas==2.2.0
+
+# Embeddings
+sentence-transformers==2.3.1
+transformers==4.37.2
+torch==2.1.2
+
+# Utilities
+requests==2.31.0
+python-dateutil==2.8.2
+python-dotenv==1.0.1
