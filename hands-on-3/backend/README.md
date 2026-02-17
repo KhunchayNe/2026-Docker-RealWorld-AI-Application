@@ -34,3 +34,50 @@ pip install fastapi uvicorn qdrant-client
 pip install tensorflow==2.18.0
 pip install sentence-transformers pandas scikit-learn
 
+
+# 1. สร้างข้อมูลตัวอย่าง
+curl -X POST "http://localhost:8000/generate-sample-data"
+
+# 2. Train model
+curl -X POST "http://localhost:8000/train" \
+  -H "Content-Type: application/json" \
+  -d '{"fuel_type": "diesel", "retrain": true}'
+
+# 3. ทำนายราคา 7 วัน
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"fuel_type": "diesel", "horizon": 7}'
+
+# 4. ค้นหาราคาใกล้เคียง
+curl "http://localhost:8000/search?price=32.5&fuel_type=diesel&limit=5"
+
+# 5. ดูราคาล่าสุด
+curl "http://localhost:8000/prices/latest"
+
+
+
+# 1. โหลดข้อมูลจาก EPPO
+curl -X POST "http://localhost:8000/upload-csv-url?url=https://catalog.eppo.go.th/dataset/b15f2fe3-14f0-4de5-b90e-2a5b63b4e717/resource/7d56918d-adbf-42b7-bd36-e4b33d425027/download/dataset_11_86.csv"
+
+curl -X POST "http://localhost:8000/upload-csv" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@oil_prices.csv"
+
+# 2. ตรวจสอบว่ามีข้อมูลแล้ว
+curl "http://localhost:8000/prices/latest"
+
+# 3. Train model
+curl -X POST "http://localhost:8000/train" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fuel_type": "diesel",
+    "retrain": false
+  }'
+
+# 4. ทำนายราคา
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fuel_type": "diesel",
+    "horizon": 7
+  }'

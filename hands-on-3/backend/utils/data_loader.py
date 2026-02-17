@@ -78,8 +78,9 @@ def load_eppo_csv(file_path: str, encoding: str = 'utf-8-sig') -> pd.DataFrame:
         df = df.sort_values('date').reset_index(drop=True)
         
         # เติมค่าว่างด้วย forward fill
-        df = df.fillna(method='ffill').fillna(method='bfill')
-        
+        # df = df.fillna(method='ffill').fillna(method='bfill')
+        df = df.ffill().bfill()
+                
         # ลบ rows ที่ date เป็น NaT
         df = df.dropna(subset=['date'])
         
