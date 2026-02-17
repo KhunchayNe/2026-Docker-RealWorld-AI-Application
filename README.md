@@ -97,7 +97,7 @@ Docker ช่วย:
 
 ## Traditional VM
 
-![Image](https://www.netapp.com/media/container-vs-vm-inline1_tcm19-82163.png?v=85344)
+![Image](https://github.com/KhunchayNe/2026-Docker-RealWorld-AI-Application/images/container-vs-vm-inline1_tcm19-82163.png.jpeg)
 
 ### Machine Virtualization
 * แต่ละ VM มี Guest OS
