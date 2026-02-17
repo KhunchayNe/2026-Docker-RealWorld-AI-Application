@@ -242,39 +242,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 ```
 
----
-
-# 🧠 Module 4 — Backend + Database
-
-## Backend (Python FastAPI)
-
-```bash
-pip install fastapi uvicorn
-```
-
-โครงสร้าง:
-
-```
-app/
- ├─ main.py
- ├─ routers/
- ├─ services/
- └─ models/
-```
-
----
-
-## Database
-
-### PostgreSQL
-
-PostgreSQL
-
-### MongoDB
-
-MongoDB
-
-### Redis
-
-Redis
 
