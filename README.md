@@ -114,7 +114,7 @@ Docker ช่วย:
 
 # 6) Use Case เชิง Production (Architecture-first View)
 
-### ตัวอย่าง SaaS (เช่น BeeDorm / Smart Farm OS)
+### ตัวอย่าง SaaS (เช่น Smart Farm OS)
 
 ```
 [NGINX]
