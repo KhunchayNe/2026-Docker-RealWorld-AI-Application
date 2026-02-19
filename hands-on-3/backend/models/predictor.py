@@ -16,14 +16,15 @@ class OilPricePredictor:
     Time series predictor ใช้ SARIMA model
     """
     
-    def __init__(self, model_dir: str = "./models"):
+    def __init__(self, model_dir: str = "./models", qdrant_service=None):
         self.model_dir = model_dir
         self.model = None
         self.model_fit = None
         self.scaler = None
         self.fuel_type = None
         self.last_train_date = None
-        
+        self.qdrant_service = qdrant_service
+
         os.makedirs(model_dir, exist_ok=True)
     
     def train(
@@ -165,36 +166,56 @@ class OilPricePredictor:
             raise
     
     def save_model(self):
-        """บันทึก model"""
+        """บันทึก model metadata ลง Qdrant และ save model file local"""
         if self.model_fit is None:
             return
-        
+
+        # Save model metadata to Qdrant
+        model_metadata = {
+            'fuel_type': self.fuel_type,
+            'last_train_date': self.last_train_date.strftime("%Y-%m-%d") if hasattr(self.last_train_date, 'strftime') else str(self.last_train_date),
+            'model_type': 'SARIMA' if hasattr(self.model_fit, 'get_forecast') else 'ExponentialSmoothing',
+            'created_at': pd.Timestamp.now().isoformat()
+        }
+
+        # Store in Qdrant for tracking
+        if self.qdrant_service:
+            try:
+                self.qdrant_service.store_model_metadata(self.fuel_type, model_metadata)
+                logger.info(f"Model metadata stored in Qdrant for {self.fuel_type}")
+            except Exception as e:
+                logger.warning(f"Could not store metadata in Qdrant: {e}")
+        else:
+            logger.info("No qdrant_service provided, skipping metadata storage")
+
+        # Save actual model to local filesystem (SARIMA models are too large for Qdrant)
         model_path = os.path.join(self.model_dir, f"{self.fuel_type}_model.pkl")
         with open(model_path, 'wb') as f:
             pickle.dump({
                 'model_fit': self.model_fit,
                 'fuel_type': self.fuel_type,
-                'last_train_date': self.last_train_date
+                'last_train_date': self.last_train_date,
+                'metadata': model_metadata
             }, f)
-        
+
         logger.info(f"Model saved to {model_path}")
-    
+
     def load_model(self, fuel_type: str):
-        """โหลด model"""
+        """โหลด model จาก local file"""
         model_path = os.path.join(self.model_dir, f"{fuel_type}_model.pkl")
-        
+
         if not os.path.exists(model_path):
-            raise FileNotFoundError(f"Model for {fuel_type} not found")
-        
+            raise FileNotFoundError(f"Model for {fuel_type} not found at {model_path}")
+
         with open(model_path, 'rb') as f:
             data = pickle.load(f)
-        
+
         self.model_fit = data['model_fit']
         self.fuel_type = data['fuel_type']
         self.last_train_date = data['last_train_date']
-        
+
         logger.info(f"Model loaded from {model_path}")
-    
+
     def model_exists(self, fuel_type: str) -> bool:
         """ตรวจสอบว่ามี model สำหรับ fuel_type นี้หรือไม่"""
         model_path = os.path.join(self.model_dir, f"{fuel_type}_model.pkl")

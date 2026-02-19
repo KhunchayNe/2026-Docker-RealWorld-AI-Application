@@ -65,7 +65,7 @@ qdrant_service = QdrantService(
     collection_name=settings.collection_name
 )
 
-predictor = OilPricePredictor(model_dir=settings.model_dir)
+predictor = OilPricePredictor(model_dir=settings.model_dir, qdrant_service=qdrant_service)
 
 # Endpoints
 @app.get("/")

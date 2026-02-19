@@ -153,3 +153,51 @@ class QdrantService:
         except Exception as e:
             logger.error(f"Search failed: {e}")
             return []
+
+    def store_model_metadata(self, fuel_type: str, metadata: Dict):
+        """
+        เก็บ model metadata ลง Qdrant collection แยก
+        สำหรับ track ประวัติการ train model
+        """
+        try:
+            # ใช้ collection แยกสำหรับ model metadata
+            metadata_collection = f"{self.collection_name}_models"
+
+            # สร้าง collection ถ้ายังไม่มี
+            try:
+                self.client.get_collection(metadata_collection)
+            except:
+                self.client.create_collection(
+                    collection_name=metadata_collection,
+                    vectors_config=VectorParams(
+                        size=self.vector_size,
+                        distance=Distance.COSINE
+                    )
+                )
+                logger.info(f"Created metadata collection '{metadata_collection}'")
+
+            # สร้าง embedding จาก metadata description
+            text = f"Model for {fuel_type}, trained on {metadata.get('last_train_date')}, type {metadata.get('model_type')}"
+            vector = self.embedding_model.encode(text).tolist()
+
+            # สร้าง point ID จาก fuel_type + timestamp
+            point_id = hash(f"{fuel_type}_{metadata.get('created_at', '')}") % (10**10)
+
+            # เพิ่ม metadata ลง collection
+            self.client.upsert(
+                collection_name=metadata_collection,
+                points=[
+                    PointStruct(
+                        id=point_id,
+                        vector=vector,
+                        payload=metadata
+                    )
+                ]
+            )
+
+            logger.info(f"Stored model metadata for {fuel_type} in Qdrant (point_id: {point_id})")
+            return point_id
+
+        except Exception as e:
+            logger.error(f"Failed to store model metadata: {e}")
+            raise

@@ -115,6 +115,9 @@ services:
     image: qdrant/qdrant:v1.12.0
     volumes:
       - oil-price-qdrant-data:/qdrant/storage
+    labels:
+      traefik.http.routers.qdrant.rule: Host(`qdrant.localhost`)
+      traefik.http.services.qdrant.loadbalancer.server.port: 6333
 
   ###################################################
   # Service: qdrant-web-ui
@@ -126,16 +129,16 @@ services:
   # the routing rules. All requests to qdrant.localhost will be forwarded
   # to this service's port 6333.
   ###################################################
-  qdrant-web-ui:
-    image: qdrant/qdrant:v1.12.0
-    command: ["./qdrant", "--ui-path", "/"]
-    environment:
-      QDRANT__SERVICE__GRPC_PORT: 6334
-    volumes:
-      - oil-price-qdrant-data:/qdrant/storage
-    labels:
-      traefik.http.routers.qdrant.rule: Host(`qdrant.localhost`)
-      traefik.http.services.qdrant.loadbalancer.server.port: 6333
+  # qdrant-web-ui:
+  #   image: qdrant/qdrant:v1.12.0
+  #   command: ["./qdrant", "--ui-path", "/"]
+  #   environment:
+  #     QDRANT__SERVICE__GRPC_PORT: 6334
+  #   volumes:
+  #     - oil-price-qdrant-data:/qdrant/storage
+  #   labels:
+  #     traefik.http.routers.qdrant.rule: Host(`qdrant.localhost`)
+  #     traefik.http.services.qdrant.loadbalancer.server.port: 6333
 
 ###################################################
 # Volumes
